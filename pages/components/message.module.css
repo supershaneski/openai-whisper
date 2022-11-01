@@ -1,0 +1,22 @@
+.message {
+    background-color: #5559;
+    border-radius: 0.2em;
+    position: relative;
+    padding: 1em;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.message:last-child {
+    margin-bottom: 0;
+}
+.text {
+    margin: 0;
+    margin-right: 10px;
+}
+.text span.item {
+    display: block;
+    color: #FFF;
+}
+

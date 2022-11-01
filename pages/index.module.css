@@ -1,0 +1,84 @@
+.container {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    zoom: 0.7;
+}
+
+.panelMessages {
+    background-image: linear-gradient(#333, #2E2E2E);
+    position: relative;
+    width: 100vw;
+    height: calc(100% - 200px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.listMessages {
+    position: relative;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.panelControl {
+    background-color: #333;
+    position: relative;
+    width: 100vw;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 3em;
+    box-sizing: border-box;
+}
+.centerContainer {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+.progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+.buttonCenter {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media screen and (min-width: 600px) {
+    
+    .container {
+        flex-direction: row;
+    }
+    .panelMessages {
+        background-image: linear-gradient(to right, #333, #2E2E2E);
+        width: calc(100vw - 200px);
+        height: 100vh;
+    }
+    .listMessages {
+        padding-bottom: 2em;
+    }
+    .panelControl {
+        width: 200px;
+        height: 100vh;
+    }
+
+}
