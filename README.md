@@ -33,7 +33,11 @@ This is all my system can handle otherwise it will come to a stand still.
 
 ## The App
 
-Basically, the app will record just 5 seconds of audio, send it to the server, transcribe it and send the result back.
+Basically, the app will record continuous 5 seconds of audio, upload it to the server, transcribe it and send the result back.
+You can also play the uploaded audio file.
+In my machine, even using `tiny` model takes time to transcribe the audio.
+
+Please note that the uploaded files and transcribe output can easily increase in number inside the `upload` and `root` folder, respectively.
 
 As for the code itself, I used `class component` (I know, I know...) because I had a difficult time to access `state variables` using hooks when I was developing. I started using `functional component` but decided later on refactored it to `class component`.
 
