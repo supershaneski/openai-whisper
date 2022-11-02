@@ -358,7 +358,9 @@ class Page extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <div className={classes.panelRight}></div>
+                    <div className={classes.panelRight}>
+                        <div className={classes.period}>{this.RECORD_TIME}s</div>
+                    </div>
                 </div>
                 <audio ref={this.audioRef} controls style={{ display: 'none' }}></audio>
             </div>

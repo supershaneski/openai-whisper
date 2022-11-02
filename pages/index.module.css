@@ -47,7 +47,15 @@
 }
 
 .panelLeft, .panelRight {
-    width: 2em;
+    width: 3em;
+}
+.panelRight {
+    text-align: right;
+}
+.period {
+    margin-right: 1em;
+    font-size: 0.8em;
+    color: #777;
 }
 
 .panelControl {

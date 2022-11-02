@@ -23,6 +23,10 @@ _bin
 *.m4a.srt
 *.m4a.txt
 *.m4a.vtt
+public/uploads/*.m4a
+public/uploads/*.m4a.srt
+public/uploads/*.m4a.txt
+public/uploads/*.m4a.vtt
 
 *.pem
 *.crt
