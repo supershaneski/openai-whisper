@@ -45,8 +45,9 @@ export function getFilesFromUpload() {
 
             } else {
 
+                // this is a crude way to detect the time range part
                 if(tokens[i].indexOf('00:') >= 0) {
-                    str = tokens[i].trim()
+                    str = `[${tokens[i].trim()}]`
                     f = true
                 }
 

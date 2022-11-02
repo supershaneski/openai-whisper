@@ -18,11 +18,17 @@
     align-items: center;
 }
 .text {
-    margin: 0;
     margin-right: 10px;
 }
-.text span.item {
-    display: block;
+.text .item {
+    margin: 0;
+}
+.textTime {
+    margin-right: 0.5em;
+    font-size: 0.8em;
+    color: #AAA;
+}
+.textText {
     color: #FFF;
 }
 

@@ -14,19 +14,25 @@ function Message({ id, texts, mode, disabled, onClick }) {
     let now = id.replace('tmp-file', '').replace('.m4a', '')
     let display_date = getDateTimeFromMS(now)
 
-    //console.log("file", now, display_date)
-
     return (
         <div className={classes.message}>
             <div className={classes.datetime}>{ display_date }</div>
             <div className={classes.inner}>
-                <p className={classes.text}>
+                <div className={classes.text}>
                 { texts.map((text, index) => {
+
+                    const token = text.split("] ")
+                    const text_time = token[0] + ']'
+                    const text_text = token.length > 1 ? token[1] : ''
+
                     return (
-                        <span key={index} className={classes.item}>{ text }</span>
+                        <p key={index} className={classes.item}>
+                            <span className={classes.textTime}>{ text_time }</span>
+                            <span className={classes.textText}>{ text_text }</span>
+                        </p>
                     )
                 }) }
-                </p>
+                </div>
                 <div className={classes.action}>
                     <IconButton disabled={disabled} onClick={() => onClick(id)}>
                     { mode > 0 ? <Pause color="#FFD167" /> : <Play color="#999" /> }
