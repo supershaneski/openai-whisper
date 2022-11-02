@@ -6,7 +6,6 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    zoom: 0.7;
 }
 
 .panelMessages {
@@ -27,13 +26,37 @@
     overflow-y: auto;
 }
 
+.indicator {
+    background-color: #F66;
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    margin-left: 1em;
+    animation: blink 0.5s ease infinite;
+}
+.indicatorOff {
+    background-color: #222;
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    margin-left: 1em;
+}
+@keyframes blink {
+    0% { background-color: #F66; }
+    100% { background-color: #F06; }
+}
+
+.panelLeft, .panelRight {
+    width: 2em;
+}
+
 .panelControl {
     background-color: #333;
     position: relative;
     width: 100vw;
     height: 200px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     padding-bottom: 3em;
     box-sizing: border-box;
@@ -50,6 +73,7 @@
     width: 100%;
     height: 100%;
     z-index: 1;
+    overflow: hidden;
 }
 .buttonCenter {
     position: absolute;

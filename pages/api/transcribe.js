@@ -26,8 +26,10 @@ apiRoute.post((req, res) => {
 
     const filename = req.file.path
 
-    exec(`whisper './${filename}' --model tiny --language Japanese --task translate`, (err, stdout, stderr) => {
-        if (err) {
+    //exec(`whisper './${filename}' --model tiny --language Japanese --task translate`, (err, stdout, stderr) => {
+    //exec(`whisper './${filename}' --language Japanese --task translate`, (err, stdout, stderr) => {
+    exec(`whisper './${filename}' --model tiny`, (err, stdout, stderr) => {
+            if (err) {
             res.send({ status: 300, error: err, out: null, file: null })
         } else {
             res.send({ status: 200, error: stderr, out: stdout, file: req.file })

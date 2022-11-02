@@ -6,6 +6,9 @@ import IconButton from './components/iconbutton'
 import Microphone from './components/microphone'
 import MicrophoneOff from './components/microphoneOff'
 
+import { getFilesFromUpload } from './lib/upload'
+import { useStorage } from './lib/useStorage'
+
 const sendData = async (file) => {
 
     let formData = new FormData()
@@ -29,6 +32,18 @@ const formatData = (data) => {
 
 }
 
+export async function getServerSideProps(context) {
+
+    //const { params, req, res, query } = context;
+    //console.log(params, query)
+
+    const files = getFilesFromUpload()
+
+    return {
+        props: { prev: files },
+    }
+}
+
 class Page extends React.Component {
 
     constructor(props) {
@@ -38,18 +53,26 @@ class Page extends React.Component {
         this.audioRef = React.createRef()
 
         this.state = {
-            data: [],
+            data: this.props.prev || [],
 
             progress: 0,
 
             selected: '',
             error: false,
             started: false,
+
+            sendStatus: 0,
         }
 
         this.timer = null
         this.mediaRec = null
         this.chunks = []
+
+        this.storage = []
+        this.sendFlag = false
+
+        this.MAX_COUNT = 10
+        this.RECORD_TIME = 30
 
         this.handlePlay = this.handlePlay.bind(this)
         this.handleStart = this.handleStart.bind(this)
@@ -62,10 +85,14 @@ class Page extends React.Component {
         this.handleStop = this.handleStop.bind(this)
 
         this.procData = this.procData.bind(this)
+
+        this.handleUnload = this.handleUnload.bind(this)
     }
 
     componentDidMount() {
-        
+
+        window.addEventListener('beforeunload', this.handleUnload)
+
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
             const options = { audio: true }
@@ -81,6 +108,19 @@ class Page extends React.Component {
 
         }
 
+    }
+
+    componentWillUnmount() {
+
+        window.removeEventListener('beforeunload', this.handleUnload)
+
+    }
+
+    handleUnload(e) {
+        e.preventDefault()
+        //return this.storage.length > 0 ? e.returnValue = "There are still data being processed.\nAre you sure?" : true
+        if(this.storage.length > 0) return
+        e.returnValue = true
     }
 
     handleError(error) {
@@ -111,17 +151,55 @@ class Page extends React.Component {
 
         var file = new File([blob], `file${Date.now()}.m4a`);
 
-        this.procData(file)
+        this.storage.push(file)
+
+        this.setState({
+            sendStatus: 1,
+        })
+
+        //this.procData(file)
+        this.procData()
 
         if(this.state.started) {
             
-            this.chunks = []
-            this.mediaRec.start()
+            if(this.storage.length >= this.MAX_COUNT) {
+                
+                clearInterval(this.timer)
+
+                this.setState({
+                    progress: 0,
+                    started: false,
+                })
+
+            } else {
+
+                this.chunks = []
+                this.mediaRec.start()
+
+            }
+
+            //this.chunks = []
+            //this.mediaRec.start()
 
         }
     }
 
-    procData(file) {
+    //procData(file) {
+    procData() {
+
+        if(this.sendFlag) return;
+
+        const file = this.storage.pop()
+        if(!file) {
+
+            this.setState({
+                sendStatus: 0,
+            })
+
+            return
+        }
+
+        this.sendFlag = true
 
         sendData(file).then(resp => {
 
@@ -148,13 +226,20 @@ class Page extends React.Component {
 
             }
 
+            this.sendFlag = false
+            this.procData()
+
         }).catch(error => {
             console.log(error)
+            this.sendFlag = false
+            this.procData()
         })
 
     }
 
     startTimer() {
+
+        const interval = Math.round((this.RECORD_TIME * 1000)/100)
         
         this.timer = setInterval(() => {
 
@@ -169,7 +254,7 @@ class Page extends React.Component {
                 progress: p,
             })
 
-        }, 50)
+        }, interval)
 
     }
 
@@ -196,7 +281,7 @@ class Page extends React.Component {
                 selected: '',
             })
 
-        }, 5000)
+        }, (this.RECORD_TIME * 1000))
 
     }
 
@@ -234,8 +319,8 @@ class Page extends React.Component {
     render() {
 
         const display_data = this.state.data.sort((a, b) => {
-            if(a.id > b.id) return 1
-            if(a.id < b.id) return -1
+            if(a.id > b.id) return -1
+            if(a.id < b.id) return 1
             return 0
         })
 
@@ -258,6 +343,9 @@ class Page extends React.Component {
                     </div>
                 </div>
                 <div className={classes.panelControl}>
+                    <div className={classes.panelLeft}>
+                        <div className={this.state.sendStatus > 0 ? classes.indicator : classes.indicatorOff}></div>
+                    </div>
                     <div className={classes.panelCenter}>
                         <div className={classes.centerContainer}>
                             <div className={classes.progress}>
@@ -270,6 +358,7 @@ class Page extends React.Component {
                             </div>
                         </div>
                     </div>
+                    <div className={classes.panelRight}></div>
                 </div>
                 <audio ref={this.audioRef} controls style={{ display: 'none' }}></audio>
             </div>

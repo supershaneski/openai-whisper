@@ -4,12 +4,18 @@
     position: relative;
     padding: 1em;
     margin-bottom: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 .message:last-child {
     margin-bottom: 0;
+}
+.datetime {
+    font-size: 0.7em;
+    color: #e6e6e6;
+}
+.inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 .text {
     margin: 0;

@@ -24,6 +24,9 @@ _bin
 *.m4a.txt
 *.m4a.vtt
 
+*.pem
+*.crt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
