@@ -36,6 +36,8 @@ This is all my system can handle otherwise it will come to a stand still.
 
 ## The App
 
+![Screenshot](./public/screenshot.png "Screenshot")
+
 Basically, the app will record continuous `5 seconds` (by default) of audio, upload it to the server, transcribe it using `Whisper` and send the result back.
 You can edit the recordingperiod by editing `this.RECORD_TIME` variable.
 
