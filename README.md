@@ -36,20 +36,27 @@ This is all my system can handle otherwise it will come to a stand still.
 
 ## The App
 
-![Screenshot](./public/screenshot.png "Screenshot")
+![App](./public/screenshot.png "App")
 
 Basically, the app will record continuous `5 seconds` (by default) of audio, upload it to the server, transcribe it using `Whisper` and send the result back.
-You can edit the recordingperiod by editing `this.RECORD_TIME` variable.
+You can edit the recordingperiod by editing `duration` in `Settings`.
 
 At first, I was sending the audio data as it is created. 
 However, this caused bottle-neck as transcribing takes time.
 So I tried implementing a queue like approach, to only send data one at a time and wait until it finishes before sending another.
 
-Please note that the uploaded files and transcribed output can easily increase in number inside the `upload` and `root` folder, respectively.
+Please note that the uploaded files and transcribed output can easily increase in number inside the `upload` folder.
 I will probably need to set a maximum count after which I automatically stop recording for safety purposes.
 
+![Output](./public/screenshot3.png "Output")
+
+It is possible to play the uploaded audio and follow the text output since the time period is shown.
+
 As for the code itself, I used `class component` (I know, I know...) because I had a difficult time to access `state variables` using hooks when I was developing.
-I started using `functional component` but decided later on refactored it to `class component`.
+
+![Settings](./public/screenshot2.png "Settings")
+
+It is also now possible to change recording `duration` and several `Whisper` options such as `language`, `model` and `task` from the `Settings` dialog. Please check [Whisper's github repository](https://github.com/openai/whisper) for the explanation on the options.
 
 There are still lots of things to do so this project is still a work in progress...
 
@@ -99,6 +106,8 @@ Open your browser to `http://localhost:3006/` to load the application page.
 ## Using HTTPS
 
 You might want to run this app using `https` protocol.
+This is needed if you want to use a separate device for audio capture and use your machine as server.
+
 In order to do so, prepare the proper `certificate` and `key` files and edit `server.js` at the root directory.
 
 Then run

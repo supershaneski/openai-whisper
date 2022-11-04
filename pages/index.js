@@ -78,7 +78,7 @@ class Page extends React.Component {
         this.sendFlag = false
 
         this.MAX_COUNT = 10
-        this.RECORD_TIME = 30
+        //this.RECORD_TIME = 30
 
         this.handlePlay = this.handlePlay.bind(this)
         this.handleStart = this.handleStart.bind(this)
