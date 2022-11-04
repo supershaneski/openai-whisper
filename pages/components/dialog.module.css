@@ -1,0 +1,69 @@
+.dialog {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    background-color: #555;
+    border-radius: 5px;
+    position: relative;
+    width: 80%;
+    max-width: 560px;
+    height: 220px;
+    overflow: hidden;
+}
+.header {
+    position: relative;
+    height: 40px;
+    padding: 0 0.3em 0 1em;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.title {
+    margin: 0;
+}
+.times {
+    background-color: #4c4c4c;
+    border-radius: 50%;
+    font-size: 1em;
+    font-weight: 600;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.main {
+    position: relative;
+    height: calc(100% - 40px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.form {
+    position: relative;
+    width: calc(100% - 2em);
+}
+.item {
+    position: relative;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+.item label {
+    font-size: 1em;
+    color: #fff;
+}
+.item select {
+    width: 120px;
+    font-size: 1em;
+}
+
+@media screen and (min-width: 600px) {
+    .form {
+        display: flex;
+        justify-content: space-between;
+    }
+    .item {
+        flex-direction: column;
+        margin-bottom: 0;
+    }
+}

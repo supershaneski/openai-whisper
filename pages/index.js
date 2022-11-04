@@ -7,13 +7,16 @@ import Microphone from './components/microphone'
 import MicrophoneOff from './components/microphoneOff'
 import Settings from './components/settings'
 
+import Dialog from './components/dialog'
+
 import { getFilesFromUpload } from './lib/upload'
 //import { useStorage } from './lib/useStorage'
 
-const sendData = async (file) => {
+const sendData = async (file, options) => {
 
     let formData = new FormData()
     formData.append("file", file)
+    formData.append("options", JSON.stringify(options))
 
     const resp = await fetch("/api/transcribe", {
         method: "POST",
@@ -35,9 +38,6 @@ const formatData = (data) => {
 
 export async function getServerSideProps(context) {
 
-    //const { params, req, res, query } = context;
-    //console.log(params, query)
-
     const files = getFilesFromUpload()
 
     return {
@@ -54,15 +54,20 @@ class Page extends React.Component {
         this.audioRef = React.createRef()
 
         this.state = {
+
             data: this.props.prev || [],
 
             progress: 0,
-
             selected: '',
             error: false,
             started: false,
-
             sendStatus: 0,
+
+            openDialog: false,
+            duration: 5,
+            model: "tiny",
+            language: "Japanese",
+            task: "translate",
         }
 
         this.timer = null
@@ -90,6 +95,8 @@ class Page extends React.Component {
         this.handleUnload = this.handleUnload.bind(this)
 
         this.handleSettings = this.handleSettings.bind(this)
+        this.handleCloseSettings = this.handleCloseSettings.bind(this)
+        
     }
 
     componentDidMount() {
@@ -119,13 +126,21 @@ class Page extends React.Component {
 
     }
 
-    handleSettings() {
-        //
+    handleCloseSettings() {
+        this.setState({
+            openDialog: false,
+        })
     }
 
+    handleSettings() {
+        if(this.state.started || this.state.sendStatus > 0) return
+        this.setState({
+            openDialog: true,
+        })
+    }
+    
     handleUnload(e) {
         e.preventDefault()
-        //return this.storage.length > 0 ? e.returnValue = "There are still data being processed.\nAre you sure?" : true
         if(this.storage.length > 0) return
         e.returnValue = true
     }
@@ -164,7 +179,6 @@ class Page extends React.Component {
             sendStatus: 1,
         })
 
-        //this.procData(file)
         this.procData()
 
         if(this.state.started) {
@@ -185,21 +199,15 @@ class Page extends React.Component {
 
             }
 
-            //this.chunks = []
-            //this.mediaRec.start()
-
         }
     }
 
-    //procData(file) {
     procData() {
 
         if(this.sendFlag) return;
 
         const file = this.storage.pop()
         if(!file) {
-
-            console.log("finished")
 
             this.setState({
                 sendStatus: 0,
@@ -208,11 +216,9 @@ class Page extends React.Component {
             return
         }
 
-        console.log("remaining", this.storage.length)
-
         this.sendFlag = true
 
-        sendData(file).then(resp => {
+        sendData(file, { model: this.state.model, language: this.state.language, task: this.state.task }).then(resp => {
 
             const _status = resp.status
             const _file = resp.file?.filename
@@ -250,7 +256,7 @@ class Page extends React.Component {
 
     startTimer() {
 
-        const interval = Math.round((this.RECORD_TIME * 1000)/100)
+        const interval = Math.round((this.state.duration * 1000)/100)
         
         this.timer = setInterval(() => {
 
@@ -364,7 +370,7 @@ class Page extends React.Component {
                 <div className={classes.panelControl}>
                     <div className={classes.settings}>
                         <IconButton onClick={this.handleSettings}>
-                            <Settings color="#656565" />
+                            <Settings color={this.state.started || this.state.sendStatus > 0 ? '#444' : '#656565'} />
                         </IconButton>
                     </div>
                     <div className={classes.panelLeft}>
@@ -383,9 +389,25 @@ class Page extends React.Component {
                         </div>
                     </div>
                     <div className={classes.panelRight}>
-                        <div className={classes.period}>{this.RECORD_TIME}s</div>
+                        <div className={classes.period}>{this.state.duration}s</div>
                     </div>
                 </div>
+                {
+                    this.state.openDialog &&
+                    <div className={classes.dialog}>
+                        <Dialog 
+                        duration={this.state.duration}
+                        model={this.state.model}
+                        language={this.state.language}
+                        task={this.state.task}
+                        onClose={this.handleCloseSettings}
+                        onChangeDuration={(_duration) => this.setState({duration: parseInt(_duration)})}
+                        onChangeModel={(_model) => this.setState({model: _model})}
+                        onChangeLanguage={(_language) => this.setState({language: _language})}
+                        onChangeTask={(_task) => this.setState({task: _task})}
+                        />
+                    </div>
+                }
                 <audio ref={this.audioRef} controls style={{ display: 'none' }}></audio>
             </div>
         )

@@ -1,6 +1,7 @@
 import nextConnect from 'next-connect'
 import multer from 'multer'
 import { exec } from 'child_process'
+import getConfig from 'next/config'
 
 const upload = multer({
     storage: multer.diskStorage({
@@ -22,16 +23,19 @@ const uploadMiddleware = upload.single('file')
 
 apiRoute.use(uploadMiddleware)
 
+const { serverRuntimeConfig } = getConfig()
+
 apiRoute.post((req, res) => {
 
-    console.log("dirname", __dirname)
-
+    const options = JSON.parse(req.body.options)
+    
     const filename = req.file.path
+    const outputDir = serverRuntimeConfig.PROJECT_ROOT + '/public/uploads'
 
-    //exec(`whisper './${filename}' --model tiny --language Japanese --task translate`, (err, stdout, stderr) => {
-    //exec(`whisper './${filename}' --language Japanese --task translate`, (err, stdout, stderr) => {
-    exec(`whisper './${filename}' --model tiny --language Japanese --task translate`, (err, stdout, stderr) => {
-            if (err) {
+    let sCommand = `whisper './${filename}' --model ${options.model} --language ${options.language} --task ${options.task} --output_dir '${outputDir}'`
+    
+    exec(sCommand, (err, stdout, stderr) => {
+        if (err) {
             res.send({ status: 300, error: err, out: null, file: null })
         } else {
             res.send({ status: 200, error: stderr, out: stdout, file: req.file })

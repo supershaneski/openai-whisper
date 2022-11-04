@@ -8,25 +8,18 @@ export function getFilesFromUpload() {
 
     const uploadDir = 'uploads'
 
-    ///console.log('root', serverRuntimeConfig.PROJECT_ROOT) // no end backslash
-
     const dir = path.join(serverRuntimeConfig.PROJECT_ROOT, './public', uploadDir)
 
     let files = fs.readdirSync(dir).filter(item => item.indexOf(".DS_Store") < 0)
 
-    //let srtfiles = files.map(item => `${serverRuntimeConfig.PROJECT_ROOT}/${item}.srt`)
-    //srtfiles = srtfiles.filter(item => fs.existsSync(item))
-
-    let srtfiles = files.filter(item => fs.existsSync(`${serverRuntimeConfig.PROJECT_ROOT}/${item}.srt`))
-
-    //console.log(srtfiles)
-
+    let srtfiles = files.filter(item => fs.existsSync(`${dir}/${item}.srt`))
+    
     let prevData = srtfiles.map(item => {
 
         let id = item
         let url = `/uploads/${item}`
         
-        let txt = fs.readFileSync(`${serverRuntimeConfig.PROJECT_ROOT}/${item}.srt`, {encoding: 'utf8', flag: 'r'})
+        let txt = fs.readFileSync(`${dir}/${item}.srt`, {encoding: 'utf8', flag: 'r'})
 
         let tokens = txt.split("\n")
         let texts = []
