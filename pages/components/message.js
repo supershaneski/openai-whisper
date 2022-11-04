@@ -9,6 +9,11 @@ import IconButton from './iconbutton'
 
 import { getDateTimeFromMS } from '../lib/utils'
 
+function removeHour(str) {
+    let token = str.split(":")
+    return token.length > 2 ? [token[1], token[2]].join(":") : [token[0], token[1]].join(":")
+}
+
 function Message({ id, texts, mode, disabled, onClick }) {
 
     let now = id.replace('tmp-file', '').replace('.m4a', '')
@@ -22,7 +27,19 @@ function Message({ id, texts, mode, disabled, onClick }) {
                 { texts.map((text, index) => {
 
                     const token = text.split("] ")
-                    const text_time = token[0] + ']'
+
+                    let tmp_time = token[0].replaceAll(',', '.')
+                    tmp_time = tmp_time.slice(1)
+
+                    let stoken = tmp_time.split(" --> ")
+                    let time1 = stoken[0].trim()
+                    let time2 = stoken[1].trim()
+
+                    time1 = removeHour(time1)
+                    time2 = removeHour(time2)
+
+                    //const text_time = tmp_time + ']' //token[0] + ']'
+                    const text_time = `[${time1} --> ${time2}]`
                     const text_text = token.length > 1 ? token[1] : ''
 
                     return (
