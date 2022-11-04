@@ -24,6 +24,8 @@ apiRoute.use(uploadMiddleware)
 
 apiRoute.post((req, res) => {
 
+    console.log("dirname", __dirname)
+
     const filename = req.file.path
 
     //exec(`whisper './${filename}' --model tiny --language Japanese --task translate`, (err, stdout, stderr) => {

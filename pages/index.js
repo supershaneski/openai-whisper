@@ -5,9 +5,10 @@ import Progress from './components/progress'
 import IconButton from './components/iconbutton'
 import Microphone from './components/microphone'
 import MicrophoneOff from './components/microphoneOff'
+import Settings from './components/settings'
 
 import { getFilesFromUpload } from './lib/upload'
-import { useStorage } from './lib/useStorage'
+//import { useStorage } from './lib/useStorage'
 
 const sendData = async (file) => {
 
@@ -87,6 +88,8 @@ class Page extends React.Component {
         this.procData = this.procData.bind(this)
 
         this.handleUnload = this.handleUnload.bind(this)
+
+        this.handleSettings = this.handleSettings.bind(this)
     }
 
     componentDidMount() {
@@ -114,6 +117,10 @@ class Page extends React.Component {
 
         window.removeEventListener('beforeunload', this.handleUnload)
 
+    }
+
+    handleSettings() {
+        //
     }
 
     handleUnload(e) {
@@ -192,12 +199,16 @@ class Page extends React.Component {
         const file = this.storage.pop()
         if(!file) {
 
+            console.log("finished")
+
             this.setState({
                 sendStatus: 0,
             })
 
             return
         }
+
+        console.log("remaining", this.storage.length)
 
         this.sendFlag = true
 
@@ -259,6 +270,8 @@ class Page extends React.Component {
     }
 
     async handlePlay(id) {
+
+        if(this.state.selected) return;
         
         this.setState({
             selected: id,
@@ -266,23 +279,29 @@ class Page extends React.Component {
 
         const selitem = this.state.data.find(item => item.id === id)
 
-        var audio = new Audio(selitem.url)
+        var audio = new Audio()
         audio.type = "audio/mp4"
 
-        try {
-            await audio.play()
-        } catch(err) {
-            console.log(err)
-        }
+        audio.addEventListener('loadedmetadata', async () => {
+            
+            try {
+                await audio.play()
+            } catch(err) {
+                console.log(err)
+            }
 
-        setTimeout(() => {
+            setTimeout(() => {
 
-            this.setState({
-                selected: '',
-            })
+                this.setState({
+                    selected: '',
+                })
+    
+            }, Math.round(audio.duration * 1000))
 
-        }, (this.RECORD_TIME * 1000))
+        })
 
+        audio.src = selitem.url
+        
     }
 
     handleStart() {
@@ -343,6 +362,11 @@ class Page extends React.Component {
                     </div>
                 </div>
                 <div className={classes.panelControl}>
+                    <div className={classes.settings}>
+                        <IconButton onClick={this.handleSettings}>
+                            <Settings color="#656565" />
+                        </IconButton>
+                    </div>
                     <div className={classes.panelLeft}>
                         <div className={this.state.sendStatus > 0 ? classes.indicator : classes.indicatorOff}></div>
                     </div>

@@ -69,6 +69,12 @@
     padding-bottom: 3em;
     box-sizing: border-box;
 }
+.settings {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
+
 .centerContainer {
     position: relative;
     width: 100px;
