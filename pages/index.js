@@ -52,7 +52,7 @@ class Page extends React.Component {
         super(props)
 
         this.audioRef = React.createRef()
-
+        
         this.state = {
 
             data: this.props.prev || [],
@@ -78,7 +78,6 @@ class Page extends React.Component {
         this.sendFlag = false
 
         this.MAX_COUNT = 10
-        //this.RECORD_TIME = 30
 
         this.handlePlay = this.handlePlay.bind(this)
         this.handleStart = this.handleStart.bind(this)
@@ -92,8 +91,6 @@ class Page extends React.Component {
 
         this.procData = this.procData.bind(this)
 
-        this.handleUnload = this.handleUnload.bind(this)
-
         this.handleSettings = this.handleSettings.bind(this)
         this.handleCloseSettings = this.handleCloseSettings.bind(this)
         
@@ -101,7 +98,24 @@ class Page extends React.Component {
 
     componentDidMount() {
 
-        window.addEventListener('beforeunload', this.handleUnload)
+        try {
+
+            let rawdata = localStorage.getItem('openai-whisper-settings')
+            if(rawdata) {
+
+                const options = JSON.parse(rawdata)
+                
+                this.setState({
+                    duration: parseInt(options.duration),
+                    model: options.model,
+                    language: options.language,
+                    task: options.task,
+                })
+            }
+
+        } catch(err) {
+            //
+        }
 
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
@@ -120,9 +134,44 @@ class Page extends React.Component {
 
     }
 
-    componentWillUnmount() {
+    handleUpdateOptions({ duration, model, language, task }) {
 
-        window.removeEventListener('beforeunload', this.handleUnload)
+        let options = {
+            duration: this.state.duration,
+            model: this.state.model,
+            language: this.state.language,
+            task: this.state.task,
+        }
+
+        if(duration) {
+            this.setState({
+                duration: duration,
+            })
+            options.duration = duration
+        }
+
+        if(model) {
+            this.setState({
+                model: model,
+            })
+            options.model = model
+        }
+
+        if(language) {
+            this.setState({
+                language: language,
+            })
+            options.language = language
+        }
+
+        if(task) {
+            this.setState({
+                task: task,
+            })
+            options.task = task
+        }
+
+        localStorage.setItem('openai-whisper-settings', JSON.stringify(options))
 
     }
 
@@ -139,12 +188,6 @@ class Page extends React.Component {
         })
     }
     
-    handleUnload(e) {
-        e.preventDefault()
-        if(this.storage.length > 0) return
-        e.returnValue = true
-    }
-
     handleError(error) {
         
         this.setState({
@@ -401,10 +444,10 @@ class Page extends React.Component {
                         language={this.state.language}
                         task={this.state.task}
                         onClose={this.handleCloseSettings}
-                        onChangeDuration={(_duration) => this.setState({duration: parseInt(_duration)})}
-                        onChangeModel={(_model) => this.setState({model: _model})}
-                        onChangeLanguage={(_language) => this.setState({language: _language})}
-                        onChangeTask={(_task) => this.setState({task: _task})}
+                        onChangeDuration={(duration) => this.handleUpdateOptions({ duration })}
+                        onChangeModel={(model) => this.handleUpdateOptions({ model })}
+                        onChangeLanguage={(language) => this.handleUpdateOptions({ language })}
+                        onChangeTask={(task) => this.handleUpdateOptions({ task })}
                         />
                     </div>
                 }
