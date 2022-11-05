@@ -33,3 +33,31 @@
     color: #FFF;
 }
 
+.action {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    box-sizing: border-box;
+}
+
+.actionBottom {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    box-sizing: border-box;
+    z-index: 1;
+}
+.actionTop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    box-sizing: border-box;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

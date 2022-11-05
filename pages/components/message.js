@@ -2,8 +2,9 @@ import React from 'react'
 
 import classes from './message.module.css'
 
-import Play from './play'
-import Pause from './pause'
+//import Play from './play'
+//import Pause from './pause'
+import Arrow from './arrow'
 
 import IconButton from './iconbutton'
 
@@ -54,14 +55,11 @@ function Message({ id, texts, duration, mode, disabled, onClick }) {
             const interval = (duration * 1000)/100
             const delta = duration / 100
 
-            //console.log("time", duration, delta, interval)
-
             timer = setInterval(() => {
 
                 setCount(c => c + 1)
                 setValue(v => {
                     let vv = Math.round(10 * (v + delta))/10
-                    //console.log(vv)
                     return vv
                 })
 
@@ -99,25 +97,26 @@ function Message({ id, texts, duration, mode, disabled, onClick }) {
                 }) }
                 </div>
                 <div className={classes.action}>
-                    {
-                        mode === 0 &&
-                        <IconButton disabled={disabled} onClick={() => onClick(id)}>
-                            <Play color="#999" />
-                        </IconButton>
-                    }
-                    {
-                        mode > 0 &&
+                    <div className={classes.actionBottom}>
                         <Progress
                         value={count}
                         displayOff={true}
                         displayOther={true}
                         displayValue={value}
-                        size={21}
+                        size={24}
                         lineWidth={2}
                         lineColor="#999"
                         backgroundColor="#444"
                         />
-                    }
+                    </div>
+                    <div className={classes.actionTop}>
+                        {
+                            mode === 0 &&
+                            <IconButton size={20} disabled={disabled} onClick={() => onClick(id)}>
+                                <Arrow color="#999" />
+                            </IconButton>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
