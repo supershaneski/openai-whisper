@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Progress({ size, lineWidth, displayOff, value, lineColor, textColor, backgroundColor, progressColor }) {
+export default function Progress({ size, lineWidth, displayOff, displayOther = false, displayValue, value, lineColor, textColor, backgroundColor, progressColor }) {
 
     let p1 = value < 25 ? 90 - Math.round((value / 25)*90) : 0
     let p2 = value < 25 ? 90 : value >= 50 ? 0 : 90 - Math.round(((value - 25) / 25)*90)
@@ -24,6 +24,9 @@ export default function Progress({ size, lineWidth, displayOff, value, lineColor
                         transform: `rotate(180deg) skew(${p4}deg)`,
                     }} />
                     <div className="display">
+                        {
+                            displayOther && <div className="text2">{ displayValue }</div>
+                        }
                         {
                             !displayOff && <div className="text">{ value }<span>%</span></div>
                         }
@@ -57,6 +60,12 @@ export default function Progress({ size, lineWidth, displayOff, value, lineColor
                 display: flex;
                 justify-content: center;
                 align-items: center;
+            }
+            .text2 {
+                font-family: helvetica, arial, sans-serif;
+                font-size: 0.4em;
+                font-weight: 600;
+                color: #AAA;
             }
             .text {
                 font-family: helvetica, arial, sans-serif;

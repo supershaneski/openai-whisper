@@ -68,9 +68,12 @@ class Page extends React.Component {
             model: "tiny",
             language: "Japanese",
             task: "translate",
+
+            playDuration: 0,
         }
 
         this.timer = null
+        
         this.mediaRec = null
         this.chunks = []
 
@@ -322,9 +325,9 @@ class Page extends React.Component {
 
         if(this.state.selected) return;
         
-        this.setState({
+        /*this.setState({
             selected: id,
-        })
+        })*/
 
         const selitem = this.state.data.find(item => item.id === id)
 
@@ -333,6 +336,11 @@ class Page extends React.Component {
 
         audio.addEventListener('loadedmetadata', async () => {
             
+            this.setState({
+                playDuration: audio.duration,
+                selected: id,
+            })
+
             try {
                 await audio.play()
             } catch(err) {
@@ -401,6 +409,7 @@ class Page extends React.Component {
                             return (
                                 <Message 
                                 key={item.id}
+                                duration={this.state.playDuration}
                                 id={item.id}
                                 texts={item.texts} 
                                 mode={this.state.selected.length > 0 && this.state.selected === item.id ? 1 : 0} 
