@@ -1,11 +1,12 @@
 openai-whisper
 ===========
 
-This project was bootstrapped with [Next.JS](https://nextjs.org/) using manual setup.
+This is a sample webapp implementation of [OpenAI Whisper](https://openai.com/blog/whisper/), an automatic speech recognition (ASR) system, using [Next.JS](https://nextjs.org/).
+
+It records audio continuously for some time interval, uploads the audio data to the server for transcribing/translating then sends back the result to the front end.
+It is also possible to playback the recorded audio to verify the output.
 
 # Motivation
-
-This project is a coding exercise to explore `openai` [Whisper](https://openai.com/blog/whisper/), an automatic speech recognition (ASR) system.
 
 It has been said that `Whisper` itself is [not designed to support ***real-time*** streaming tasks per se](https://github.com/openai/whisper/discussions/2) but it does not mean we cannot try, vain as it may be, lol.
 
