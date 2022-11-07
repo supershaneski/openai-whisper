@@ -58,10 +58,7 @@ function Message({ id, texts, duration, mode, disabled, onClick }) {
             timer = setInterval(() => {
 
                 setCount(c => c + 1)
-                setValue(v => {
-                    let vv = Math.round(10 * (v + delta))/10
-                    return vv
-                })
+                setValue(v => v + delta)
 
             }, interval)
 
@@ -78,6 +75,7 @@ function Message({ id, texts, duration, mode, disabled, onClick }) {
 
     let now = id.replace('tmp-file', '').replace('.m4a', '')
     let display_date = getDateTimeFromMS(now)
+    let display_value = Math.round(10 * value)/10
 
     return (
         <div className={classes.message}>
@@ -102,7 +100,7 @@ function Message({ id, texts, duration, mode, disabled, onClick }) {
                         value={count}
                         displayOff={true}
                         displayOther={true}
-                        displayValue={value}
+                        displayValue={display_value}
                         size={24}
                         lineWidth={2}
                         lineColor="#999"
