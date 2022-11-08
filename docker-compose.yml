@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  node:
+    build: .
+    ports:
+      - '3006:3006'
+    volumes:
+      - .:/app/.
+    runtime: nvidia
+    command: '/bin/sh -c "npm install && node server.js"'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
