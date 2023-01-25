@@ -6,6 +6,8 @@ This is a sample webapp implementation of [OpenAI Whisper](https://openai.com/bl
 It records audio continuously for some time interval, uploads the audio data to the server for transcribing/translating then sends back the result to the front end.
 It is also possible to playback the recorded audio to verify the output.
 
+If you are looking for voice-chat app using `Whisper`, please check [openai-whisper-talk](https://github.com/supershaneski/openai-whisper-talk/).
+
 # Motivation
 
 It has been said that `Whisper` itself is [not designed to support ***real-time*** streaming tasks per se](https://github.com/openai/whisper/discussions/2) but it does not mean we cannot try, vain as it may be, lol.
