@@ -63,7 +63,7 @@ export default function Progress({ size, lineWidth, displayOff, displayOther = f
             }
             .text2 {
                 font-family: helvetica, arial, sans-serif;
-                font-size: 0.4em;
+                font-size: 0.6em;
                 font-weight: 600;
                 color: #FFD167;
             }

@@ -6,12 +6,12 @@
     overflow: hidden;
 }
 .inner {
-    /*background-color: #555;*/
     position: relative;
     width: 100%;
     height: 100%;
     border-radius: 50%;
     overflow: hidden;
+    box-sizing: border-box;
 }
 .display {
     background-color: #333;

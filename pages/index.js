@@ -91,7 +91,7 @@ class Page extends React.Component {
 
         this.MAX_COUNT = 10
         this.MIN_DECIBELS = -45
-        this.MAX_PAUSE = 2500
+        this.MAX_PAUSE = 3000
 
         this.animFrame = null
         this.countTimer = null
@@ -611,7 +611,9 @@ class Page extends React.Component {
                             {
                                 this.state.started &&
                                 <div className={classes.soundLevel}>
-                                    <AnimatedBars start={this.state.recording} />
+                                    <AnimatedBars 
+                                    start={this.state.recording}
+                                    />
                                 </div>
                             }
                         </div>

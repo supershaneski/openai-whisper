@@ -2,8 +2,6 @@ import React from 'react'
 
 import classes from './message.module.css'
 
-//import Play from './play'
-//import Pause from './pause'
 import Arrow from './arrow'
 
 import IconButton from './iconbutton'
@@ -101,7 +99,7 @@ function Message({ id, texts, duration, mode, disabled, onClick }) {
                         displayOff={true}
                         displayOther={true}
                         displayValue={display_value}
-                        size={24}
+                        size={32}
                         lineWidth={2}
                         lineColor="#999"
                         backgroundColor="#444"
