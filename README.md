@@ -6,9 +6,11 @@ This is a sample webapp implementation of [OpenAI Whisper](https://openai.com/bl
 It records audio data automatically and uploads the audio data to the server for transcribing/translating then sends back the result to the front end.
 It is also possible to playback the recorded audio to verify the output.
 
-If you are looking for voice-chat app using `Whisper`, please check [openai-whisper-talk](https://github.com/supershaneski/openai-whisper-talk/).
+---
 
-For `Nuxt.js` version, please check [openai-chatterbox](https://github.com/supershaneski/openai-chatterbox/).
+* If you are looking for voice-chat app using `Whisper`, please check [openai-whisper-talk](https://github.com/supershaneski/openai-whisper-talk/).
+
+* For `Nuxt.js` version, please check [openai-chatterbox](https://github.com/supershaneski/openai-chatterbox/).
 
 # Motivation
 
