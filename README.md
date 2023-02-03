@@ -3,10 +3,12 @@ openai-whisper
 
 This is a sample webapp implementation of [OpenAI Whisper](https://openai.com/blog/whisper/), an automatic speech recognition (ASR) system, using [Next.JS](https://nextjs.org/).
 
-It records audio continuously for some time interval, uploads the audio data to the server for transcribing/translating then sends back the result to the front end.
+It records audio data automatically and uploads the audio data to the server for transcribing/translating then sends back the result to the front end.
 It is also possible to playback the recorded audio to verify the output.
 
 If you are looking for voice-chat app using `Whisper`, please check [openai-whisper-talk](https://github.com/supershaneski/openai-whisper-talk/).
+
+For `Nuxt.js` version, please check [openai-chatterbox](https://github.com/supershaneski/openai-chatterbox/).
 
 # Motivation
 
@@ -41,15 +43,16 @@ This is all my system can handle otherwise it will come to a stand still.
 
 ![App](./public/screenshot.png "App")
 
-Basically, the app will record continuous `5 seconds` (by default) of audio, upload it to the server, transcribe it using `Whisper` and send the result back.
-You can edit the recordingperiod by editing `duration` in `Settings`.
+I changed the behavior of the app from previous version.
+Before, the app will record audio data continuously by some time interval, by default 5s.
+Right now, it will only start recording if it can detect sound.
 
-At first, I was sending the audio data as it is created. 
-However, this caused bottle-neck as transcribing takes time.
-So I tried implementing a queue like approach, to only send data one at a time and wait until it finishes before sending another.
+There is a threshold setting to eliminate background noise from triggering the audio capture. 
+By default it is set to `-45dB` (0dB is the loudest sound). 
+Adjust the variable `minDecibels` in `Settings` if you want to set it to lower or higher depending on your needs.
 
-Please note that the uploaded files and transcribed output can easily increase in number inside the `upload` folder.
-I will probably need to set a maximum count after which I automatically stop recording for safety purposes.
+In normal human conversation, it is said that we tend to pause, on average, around 2 seconds between each sentences. Keeping this in mind, if sound is not detected for more than 2 seconds, recording will stop and the audio data will be sent to the backend for transcribing.
+You can change this by editing the value of `maxPause`, by default set to `2500ms`.
 
 ![Output](./public/screenshot3.png "Output")
 
