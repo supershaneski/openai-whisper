@@ -9,24 +9,32 @@ import Settings from './components/settings'
 
 import Dialog from './components/dialog'
 
-import { getFilesFromUpload } from './lib/upload'
-//import { useStorage } from './lib/useStorage'
+import AnimatedBars from './components/animatedBars'
 
-const sendData = async (file, options) => {
+import { getFilesFromUpload } from './lib/upload'
+
+const sendData = async (file, options, signal) => {
 
     let formData = new FormData()
     formData.append("file", file)
     formData.append("options", JSON.stringify(options))
 
-    const resp = await fetch("/api/transcribe", {
-        method: "POST",
-        headers: {
-            'Accept': 'application/json',
-        },
-        body: formData,
-    })
+    try {
 
-    return await resp.json()
+        const resp = await fetch("/api/transcribe", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+            },
+            body: formData,
+            signal: signal,
+        })
+
+        return await resp.json()
+
+    } catch(err) {
+        console.log(err)
+    }
 
 }
 
@@ -63,6 +71,10 @@ class Page extends React.Component {
             started: false,
             sendStatus: 0,
 
+            recording: false,
+            countDown: false,
+            count: 0,
+
             openDialog: false,
             duration: 5,
             model: "tiny",
@@ -70,33 +82,51 @@ class Page extends React.Component {
             task: "translate",
 
             playDuration: 0,
+            minDecibels: -45,
+            maxPause: 2500,
         }
 
-        this.timer = null
-        
         this.mediaRec = null
         this.chunks = []
 
-        this.storage = []
-        this.sendFlag = false
-
         this.MAX_COUNT = 10
+        this.MIN_DECIBELS = -45
+        this.MAX_PAUSE = 3000
 
+        this.animFrame = null
+        this.countTimer = null
+        this.audioDomRef = null
+        this.abortController = null
+        
         this.handlePlay = this.handlePlay.bind(this)
         this.handleStart = this.handleStart.bind(this)
-
-        this.startTimer = this.startTimer.bind(this)
 
         this.handleStream = this.handleStream.bind(this)
         this.handleError = this.handleError.bind(this)
         this.handleData = this.handleData.bind(this)
         this.handleStop = this.handleStop.bind(this)
 
-        this.procData = this.procData.bind(this)
-
         this.handleSettings = this.handleSettings.bind(this)
         this.handleCloseSettings = this.handleCloseSettings.bind(this)
         
+    }
+
+    componentWillUnmount() {
+
+        try {
+
+            window.cancelAnimationFrame(this.animFrame)
+
+            if(this.abortController) {
+                this.abortController.abort()
+            }
+
+        } catch(err) {
+
+            console.log(err)
+
+        }
+
     }
 
     componentDidMount() {
@@ -113,6 +143,8 @@ class Page extends React.Component {
                     model: options.model,
                     language: options.language,
                     task: options.task,
+                    minDecibels: options.hasOwnProperty('minDecibels') ? parseInt(options.minDecibels) : this.MIN_DECIBELS,
+                    maxPause: options.hasOwnProperty('maxPause') ? parseInt(options.maxPause) : this.MAX_PAUSE,
                 })
             }
 
@@ -135,15 +167,33 @@ class Page extends React.Component {
 
         }
 
+        this.abortController = new AbortController()
+
     }
 
-    handleUpdateOptions({ duration, model, language, task }) {
+    handleUpdateOptions({ duration, model, language, task, minDecibels, maxPause }) {
 
         let options = {
             duration: this.state.duration,
             model: this.state.model,
             language: this.state.language,
             task: this.state.task,
+            minDecibels: this.state.minDecibels,
+            maxPause: this.state.maxPause,
+        }
+
+        if(maxPause) {
+            this.setState({
+                maxPause: parseInt(maxPause),
+            })
+            options.maxPause = parseInt(maxPause)
+        }
+
+        if(minDecibels) {
+            this.setState({
+                minDecibels: parseInt(minDecibels),
+            })
+            options.minDecibels = parseInt(minDecibels)
         }
 
         if(duration) {
@@ -204,7 +254,126 @@ class Page extends React.Component {
         this.mediaRec.addEventListener('dataavailable', this.handleData)
         this.mediaRec.addEventListener("stop", this.handleStop)
 
+        this.checkAudioLevel(stream)
+
     }
+    
+    checkAudioLevel(stream) {
+
+        const audioContext = new AudioContext()
+        const audioStreamSource = audioContext.createMediaStreamSource(stream)
+        const analyser = audioContext.createAnalyser()
+        analyser.minDecibels = this.state.minDecibels
+        audioStreamSource.connect(analyser)
+
+        const bufferLength = analyser.frequencyBinCount
+        const domainData = new Uint8Array(bufferLength)
+
+        const detectSound = () => {
+
+            let soundDetected = false
+
+            analyser.getByteFrequencyData(domainData)
+
+            for (let i = 0; i < bufferLength; i++) {
+                if (domainData[i] > 0) {
+                    soundDetected = true
+                }
+            }
+
+            if(soundDetected === true) {
+
+                if(this.state.recording) {
+                    
+                    if(this.state.countDown) {
+
+                        clearInterval(this.countTimer)
+
+                        this.setState({
+                            countDown: false,
+                            count: 0,
+                        })
+
+                    }
+
+                } else {
+                    
+                    if(this.state.started) {
+
+                        this.setState({
+                            countDown: false,
+                            recording: true,
+                            count: 0,
+                        })
+
+                        this.mediaRec.start()
+
+                    }
+
+                }
+
+            } else {
+
+                if(this.state.recording) {
+
+                    if(this.state.countDown) {
+
+                        if(this.state.count >= this.state.maxPause) {
+
+                            if(this.state.started) {
+
+                                clearInterval(this.countTimer)
+
+                                this.setState({
+                                    countDown: false,
+                                    count: 0,
+                                    recording: false,
+                                })
+
+                                this.mediaRec.stop()
+
+                            }
+
+                        }
+
+                    } else {
+
+                        this.setState({
+                            count: 0,
+                            countDown: true,
+                        })
+
+                        this.startCountDown()
+
+                    }
+
+                }
+
+            }
+
+            this.animFrame = window.requestAnimationFrame(detectSound)
+
+        }
+
+        this.animFrame = window.requestAnimationFrame(detectSound)
+
+    }
+
+    startCountDown() {
+
+        this.countTimer = setInterval(() => {
+
+            this.setState((prev) => {
+                return {
+                    ...prev,
+                    count: prev.count + 100,
+                }
+            })
+
+        }, 100)
+
+    }
+
 
     handleData(e) {
         
@@ -212,59 +381,16 @@ class Page extends React.Component {
 
     }
 
-    handleStop() {
-
-        const blob = new Blob(this.chunks, {type: 'audio/webm;codecs=opus'})
-        this.chunks = []
-
-        var file = new File([blob], `file${Date.now()}.m4a`);
-
-        this.storage.push(file)
-
-        this.setState({
-            sendStatus: 1,
+    sendAudioData(file) {
+        
+        this.setState((prev) => {
+            return {
+                ...prev,
+                sendStatus: prev.sendStatus + 1,
+            }
         })
 
-        this.procData()
-
-        if(this.state.started) {
-            
-            if(this.storage.length >= this.MAX_COUNT) {
-                
-                clearInterval(this.timer)
-
-                this.setState({
-                    progress: 0,
-                    started: false,
-                })
-
-            } else {
-
-                this.chunks = []
-                this.mediaRec.start()
-
-            }
-
-        }
-    }
-
-    procData() {
-
-        if(this.sendFlag) return;
-
-        const file = this.storage.pop()
-        if(!file) {
-
-            this.setState({
-                sendStatus: 0,
-            })
-
-            return
-        }
-
-        this.sendFlag = true
-
-        sendData(file, { model: this.state.model, language: this.state.language, task: this.state.task }).then(resp => {
+        sendData(file, { model: this.state.model, language: this.state.language, task: this.state.task }, this.abortController.signal).then(resp => {
 
             const _status = resp.status
             const _file = resp.file?.filename
@@ -281,83 +407,121 @@ class Page extends React.Component {
 
                     d.push({ id: _file, url: _url.replace('public/', '/'), texts: items })
 
-                    this.setState({
-                        data: d,
+                    this.setState((prev) => {
+                        let c = prev.sendStatus - 1
+                        return {
+                            ...prev,
+                            data: d,
+                            sendStatus: c < 0 ? 0 : c,
+                        }
                     })
+
+                    return
 
                 }
 
-            }
-
-            this.sendFlag = false
-            this.procData()
+            } 
+            
+            this.setState((prev) => {
+                let c = prev.sendStatus - 1
+                return {
+                    ...prev,
+                    sendStatus: c < 0 ? 0 : c,
+                }
+            })
 
         }).catch(error => {
+
             console.log(error)
-            this.sendFlag = false
-            this.procData()
+
         })
 
     }
 
-    startTimer() {
+    handleStop() {
 
-        const interval = Math.round((this.state.duration * 1000)/100)
+        const blob = new Blob(this.chunks, {type: 'audio/webm;codecs=opus'})
+        this.chunks = []
+
+        var file = new File([blob], `file${Date.now()}.m4a`);
+
+        this.sendAudioData(file)
         
-        this.timer = setInterval(() => {
+    }
 
-            let p = this.state.progress + 1
+    async getDuration(id) {
 
-            if(p > 100) {
-                this.mediaRec.stop()
-                p = 0
-            }
+        this.audioDomRef.currentTime = 0
+        this.audioDomRef.removeEventListener('timeupdate', this.getDuration)
+
+        this.setState({
+            playDuration: this.audioDomRef.duration,
+            selected: id,
+        })
+
+        try {
+            await this.audioDomRef.play()
+        } catch(err) {
+            console.log(err)
+        }
+
+        setTimeout(() => {
+
+            this.audioDomRef.remove()
+            this.audioDomRef = null
 
             this.setState({
-                progress: p,
+                selected: '',
             })
 
-        }, interval)
-
+        }, Math.round(this.audioDomRef.duration * 1000))
     }
 
     async handlePlay(id) {
 
         if(this.state.selected) return;
         
-        /*this.setState({
-            selected: id,
-        })*/
-
         const selitem = this.state.data.find(item => item.id === id)
 
-        var audio = new Audio()
-        audio.type = "audio/mp4"
+        this.audioDomRef = new Audio()
+        this.audioDomRef.type = "audio/mp4"
 
-        audio.addEventListener('loadedmetadata', async () => {
-            
-            this.setState({
-                playDuration: audio.duration,
-                selected: id,
-            })
+        this.audioDomRef.addEventListener('loadedmetadata', async () => {
 
-            try {
-                await audio.play()
-            } catch(err) {
-                console.log(err)
-            }
+            if(this.audioDomRef.duration === Infinity) {
 
-            setTimeout(() => {
+                this.audioDomRef.currentTime = 1e101
+                this.audioDomRef.addEventListener('timeupdate', this.getDuration(id))
+    
+            } else {
 
                 this.setState({
-                    selected: '',
+                    playDuration: this.audioDomRef.duration,
+                    selected: id,
                 })
     
-            }, Math.round(audio.duration * 1000))
+                try {
+                    await this.audioDomRef.play()
+                } catch(err) {
+                    console.log(err)
+                }
+    
+                setTimeout(() => {
+
+                    this.audioDomRef.remove()
+                    this.audioDomRef = null
+    
+                    this.setState({
+                        selected: '',
+                    })
+        
+                }, Math.round(this.audioDomRef.duration * 1000))
+
+            }
 
         })
 
-        audio.src = selitem.url
+        this.audioDomRef.src = selitem.url
         
     }
 
@@ -367,14 +531,23 @@ class Page extends React.Component {
         
         if(this.state.started) {
 
-            clearInterval(this.timer)
+            clearInterval(this.countTimer)
+
+            try {
+                if(this.state.recording) {
+                    this.mediaRec.stop()
+                }
+            } catch(err) {
+                console.log(err)
+            }
 
             this.setState({
+                recording: false,
+                countDown: false,
+                count: 0,
                 progress: 0,
                 started: false,
             })
-
-            this.mediaRec.stop()
 
         } else {
 
@@ -382,11 +555,6 @@ class Page extends React.Component {
                 progress: 0,
                 started: true,
             })
-
-            this.chunks = []
-            this.mediaRec.start()
-
-            this.startTimer()
 
         }
 
@@ -433,11 +601,21 @@ class Page extends React.Component {
                             <div className={classes.progress}>
                                 <Progress value={this.state.progress} backgroundColor="#333" displayOff={true} lineWidth={5} />
                             </div>
-                            <div className={classes.buttonCenter}>
+                            <div className={classes.buttonCenter} style={{
+                                borderColor: this.state.started ? '#FFD167' : '#555'
+                            }}>
                                 <IconButton onClick={this.handleStart} size={32}>
                                     { this.state.error ? <MicrophoneOff color="#555" /> : <Microphone color={this.state.started ? "#FFD167" : "#555"} />}
                                 </IconButton>
                             </div>
+                            {
+                                this.state.started &&
+                                <div className={classes.soundLevel}>
+                                    <AnimatedBars 
+                                    start={this.state.recording}
+                                    />
+                                </div>
+                            }
                         </div>
                     </div>
                     <div className={classes.panelRight}>
@@ -448,12 +626,14 @@ class Page extends React.Component {
                     this.state.openDialog &&
                     <div className={classes.dialog}>
                         <Dialog 
-                        duration={this.state.duration}
+                        maxPause={this.state.maxPause}
+                        minDecibels={this.state.minDecibels}
                         model={this.state.model}
                         language={this.state.language}
                         task={this.state.task}
                         onClose={this.handleCloseSettings}
-                        onChangeDuration={(duration) => this.handleUpdateOptions({ duration })}
+                        onChangeMaxPause={(maxPause) => this.handleUpdateOptions({ maxPause })}
+                        onChangeMinDecibels={(minDecibels) => this.handleUpdateOptions({ minDecibels })}
                         onChangeModel={(model) => this.handleUpdateOptions({ model })}
                         onChangeLanguage={(language) => this.handleUpdateOptions({ language })}
                         onChangeTask={(task) => this.handleUpdateOptions({ task })}

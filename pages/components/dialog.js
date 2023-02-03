@@ -15,14 +15,29 @@ function Dialog(props) {
             <div className={classes.main}>
                 <div className={classes.form}>
                     <div className={classes.item}>
-                        <label>Duration</label>
-                        <select value={props.duration} onChange={(e) => props.onChangeDuration(e.target.value)}>
-                            <option value={5}>5 seconds</option>
-                            <option value={10}>10 seconds</option>
-                            <option value={15}>15 seconds</option>
-                            <option value={20}>20 seconds</option>
-                            <option value={25}>25 seconds</option>
-                            <option value={30}>30 seconds</option>
+                        <label>MinDecibels</label>
+                        <select value={props.minDecibels} onChange={(e) => props.onChangeMinDecibels(e.target.value)}>
+                            <option value={-70}>-70 dB</option>
+                            <option value={-65}>-65 dB</option>
+                            <option value={-60}>-60 dB</option>
+                            <option value={-55}>-55 dB</option>
+                            <option value={-50}>-50 dB</option>
+                            <option value={-45}>-45 dB</option>
+                            <option value={-40}>-40 dB</option>
+                            <option value={-35}>-35 dB</option>
+                            <option value={-30}>-30 dB</option>
+                        </select>
+                    </div>
+                    <div className={classes.item}>
+                        <label>MaxPause</label>
+                        <select value={props.maxPause} onChange={(e) => props.onChangeMaxPause(e.target.value)}>
+                            <option value={2000}>2000 ms</option>
+                            <option value={2500}>2500 ms</option>
+                            <option value={3000}>3000 ms</option>
+                            <option value={3500}>3500 ms</option>
+                            <option value={4000}>4000 ms</option>
+                            <option value={4500}>4500 ms</option>
+                            <option value={5000}>5000 ms</option>
                         </select>
                     </div>
                     <div className={classes.item}>
