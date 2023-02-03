@@ -62,7 +62,7 @@ As for the code itself, I used `class component` (I know, I know...) because I h
 
 ![Settings](./public/screenshot2.png "Settings")
 
-It is also now possible to change recording `duration` and several `Whisper` options such as `language`, `model` and `task` from the `Settings` dialog. Please check [Whisper's github repository](https://github.com/openai/whisper) for the explanation on the options.
+Aside from `minDecibels` and `maxPause`, you can also change several `Whisper` options such as `language`, `model` and `task` from the `Settings` dialog. Please check [Whisper's github repository](https://github.com/openai/whisper) for the explanation on the options.
 
 There are still lots of things to do so this project is still a work in progress...
 
