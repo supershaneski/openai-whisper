@@ -1,0 +1,14 @@
+.container {
+    position: relative;
+    height: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.bar {
+    position: relative;
+    border-radius: 3px;
+    background-color: #FFD167;
+    background-image: linear-gradient(#FFD167, #FFA967);
+    width: calc((100% - 9px)/8);
+}
