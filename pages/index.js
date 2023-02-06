@@ -454,6 +454,11 @@ class Page extends React.Component {
         this.audioDomRef.currentTime = 0
         this.audioDomRef.removeEventListener('timeupdate', this.getDuration)
 
+        if(this.audioDomRef.duration === Infinity) {
+            console.log("[Error] Cannot play audio data")
+            return
+        }
+
         this.setState({
             playDuration: this.audioDomRef.duration,
             selected: id,
