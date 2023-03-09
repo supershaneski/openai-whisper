@@ -8,6 +8,8 @@ It is also possible to playback the recorded audio to verify the output.
 
 ---
 
+* Using `OpenAI` [Speech to Text API](https://platform.openai.com/docs/guides/speech-to-text), please check [openai-whisper-api](https://github.com/supershaneski/openai-whisper-api/)
+
 * If you are looking for voice-chat app using `Whisper`, please check [openai-whisper-talk](https://github.com/supershaneski/openai-whisper-talk/).
 
 * For `Nuxt.js` version, please check [openai-chatterbox](https://github.com/supershaneski/openai-chatterbox/).
