@@ -242,6 +242,8 @@ class Page extends React.Component {
     }
     
     handleError(error) {
+
+        console.log(error)
         
         this.setState({
             error: true,
@@ -263,6 +265,8 @@ class Page extends React.Component {
         const audioContext = new AudioContext()
         const audioStreamSource = audioContext.createMediaStreamSource(stream)
         const analyser = audioContext.createAnalyser()
+        // by default maxDecibels is -30bB and throws INDEX_SIZE_ERR when minDecibels is the same
+        analyser.maxDecibels = -10 
         analyser.minDecibels = this.state.minDecibels
         audioStreamSource.connect(analyser)
 
