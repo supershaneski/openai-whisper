@@ -6,6 +6,8 @@ This is a sample webapp implementation of [OpenAI Whisper](https://openai.com/bl
 It records audio data automatically and uploads the audio data to the server for transcribing/translating then sends back the result to the front end.
 It is also possible to playback the recorded audio to verify the output.
 
+> **Update:** If you want to use `Next 13` with experimental feature enabled (appDir), please check [openai-whisper-api](https://github.com/supershaneski/openai-whisper-api/) instead. Just set the flag to use whisper python module instead of whisper API.
+
 ---
 
 * Using `OpenAI` [Speech to Text API](https://platform.openai.com/docs/guides/speech-to-text), please check [openai-whisper-api](https://github.com/supershaneski/openai-whisper-api/)
